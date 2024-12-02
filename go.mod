@@ -8,12 +8,15 @@ require (
 	github.com/benpate/domain v0.2.3
 	github.com/cloudflare/ahocorasick v0.0.0-20240916140611-054963ec9396
 	github.com/labstack/echo/v4 v4.12.0
+	github.com/maypok86/otter v1.2.4
 	github.com/stretchr/testify v1.9.0
 )
 
 require (
 	github.com/benpate/exp v0.8.3 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
+	github.com/dolthub/maphash v0.1.0 // indirect
+	github.com/gammazero/deque v0.2.1 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect

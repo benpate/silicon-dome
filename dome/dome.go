@@ -6,6 +6,7 @@ import (
 	"github.com/benpate/data"
 	"github.com/benpate/derp"
 	"github.com/cloudflare/ahocorasick"
+	"github.com/maypok86/otter"
 )
 
 // On advice from Gopher Academy, Silicon Dome uses Aho-Corasick string matching to block user agents.
@@ -16,31 +17,24 @@ import (
 type Dome struct {
 	blockedUserAgents *ahocorasick.Matcher
 	blockedPaths      *ahocorasick.Matcher
-	// blockedIPs        otter.CacheWithVariableTTL[string, int]
-	// blockOnError []int
-	logDatabase    data.Collection
-	logStatusCodes []int
+	blockedIPs        otter.CacheWithVariableTTL[string, int]
+	logDatabase       data.Collection
+	logStatusCodes    []int
+	blockStatusCodes  []int
 }
 
 // New returns a fully initialized Dome object.
 func New(options ...Option) Dome {
 
-	/*
-		cache, err := createCache(1024)
-
-		if err != nil {
-			panic(err)
-		}
-	*/
-
 	result := Dome{
-		// blockedIPs: cache,
+		blockedIPs: createCache(1024),
 	}
 
 	// Default settings...
 	result.With(
 		BlockKnownBadBots(),
 		BlockKnownPaths(),
+		BlockStatusCodes(http.StatusForbidden),
 		LogStatusCodes(http.StatusBadRequest, http.StatusNotFound, http.StatusForbidden),
 	)
 
@@ -59,18 +53,12 @@ func (dome *Dome) With(options ...Option) {
 // VerifyHeader verifies the returns TRUE if the provided user agent is blocked (not allowed).
 func (dome *Dome) VerifyRequest(request *http.Request) error {
 
-	/*/ Check blocked IP addresses
-	spew.Dump("Blocked IP addresses::")
-	dome.blockedIPs.Range(func(key string, value int) bool {
-		spew.Dump(key, value)
-		return true
-	})
-
-	if count, _ := dome.blockedIPs.Get(request.RemoteAddr); count > 3 {
+	// If this IP address has caused more than 5 qualifying errors (since the TTL) then block this request.
+	if count, _ := dome.blockedIPs.Get(realIPAddress(request)); count > 5 {
 		return derp.NewForbiddenError("dome.VerifyHeader", "Blocked due to previous scanning activity.  Try again later.", request.RemoteAddr)
-	}*/
+	}
 
-	// Check UserAgents
+	// Try to block request based on the User-Agent
 	userAgent := request.Header.Get("User-Agent")
 
 	if userAgent == "" {
@@ -83,7 +71,7 @@ func (dome *Dome) VerifyRequest(request *http.Request) error {
 		}
 	}
 
-	// Check Paths
+	// Try to block request based on the URL/Path
 	if dome.blockedPaths != nil {
 		path := request.URL.Path
 		if dome.blockedPaths.Contains([]byte(path)) {
@@ -91,9 +79,12 @@ func (dome *Dome) VerifyRequest(request *http.Request) error {
 		}
 	}
 
+	// This request is ALLOWED.
 	return nil
 }
 
+// HandleError is called by the HTTP middleware to report an error back into the Dome.
+// Based on configureation settings, this will log the error and/or block the IP address.
 func (d *Dome) HandleError(request *http.Request, err error) {
 
 	// If no error, then no error
@@ -101,10 +92,10 @@ func (d *Dome) HandleError(request *http.Request, err error) {
 		return
 	}
 
+	statusCode := derp.ErrorCode(err)
+
 	// Try to add this error to the database log.
 	if d.logDatabase != nil {
-
-		statusCode := derp.ErrorCode(err)
 
 		// If this is a status code that we want to log, then log it.
 		if sliceContains(d.logStatusCodes, statusCode) {
@@ -125,33 +116,16 @@ func (d *Dome) HandleError(request *http.Request, err error) {
 		}
 	}
 
-	/*/ If we're blocking certain errors, then try to check for that now
-	if d.blockOnError {
-		switch derp.ErrorCode(err) {
-		case http.StatusNotFound, http.StatusForbidden:
-			errorCount, _ := d.blockedIPs.Get(request.RemoteAddr)
-			ttl := time.Duration(2^errorCount) * time.Minute
-			d.blockedIPs.Set(request.RemoteAddr, errorCount+1, ttl)
-		}
+	// Try to block this IP address based on the statusCode
+	if sliceContains(d.blockStatusCodes, statusCode) {
+		remoteAddress := realIPAddress(request)          // get the real IP address (not some shifty, fake one)
+		errorCount, _ := d.blockedIPs.Get(remoteAddress) // get the existing error count
+		errorCount = errorCount + 1                      // increment
+		ttl := getTTL(errorCount)                        // calculate the TTL based on the number of errors in the queue
+		d.blockedIPs.Set(remoteAddress, errorCount, ttl) // save the new error count.
 	}
-	*/
 }
 
 func (d *Dome) Close() {
-	// d.blockedIPs.Close()
+	d.blockedIPs.Close()
 }
-
-/*
-func createCache(capacity int) (otter.CacheWithVariableTTL[string, int], error) {
-
-	// Don't allow negative cache sizes
-	if capacity < 0 {
-		capacity = 0
-	}
-
-	// Create a new cache with the correct capacity
-	return otter.MustBuilder[string, int](capacity).
-		WithVariableTTL().
-		Build()
-}
-*/

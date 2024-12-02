@@ -45,7 +45,7 @@ func BlockPaths(blockedPaths ...string) Option {
 }
 
 /******************************************
- * 404/Not Found Handling
+ * Log Handling
  ******************************************/
 
 // LogStatusCodes configures Dome to log requests with specific error codes
@@ -62,24 +62,30 @@ func LogDatabase(collection data.Collection) Option {
 	}
 }
 
-// CacheCapacity is a dome.Option that initializes a new IPAddress cache and sets its size
-func CacheCapacity(capacity int) Option {
+/******************************************
+ * Block Handling
+ ******************************************/
+
+// BlockStatusCodes configures Dome to log requests with specific error codes
+func BlockStatusCodes(statusCodes ...int) Option {
+	return func(d *Dome) {
+		d.blockStatusCodes = statusCodes
+	}
+}
+
+// BlockCache is a dome.Option that initializes a new cache for blocked IP addresses
+func BlockCache(capacity int) Option {
 	return func(d *Dome) {
 
-		/*
-			// If the capacity has not changed, then do nothing.
-			if capacity == d.blockedIPs.Capacity() {
-				return
-			}
+		// If the capacity has not changed, then do nothing.
+		if capacity == d.blockedIPs.Capacity() {
+			return
+		}
 
-			// Close the previous cache, if it exists
-			d.blockedIPs.Close()
+		// Close the previous cache, if it exists
+		d.blockedIPs.Close()
 
-			if cache, err := createCache(capacity); err == nil {
-				d.blockedIPs = cache
-			} else {
-				derp.Report(err)
-			}
-		*/
+		// Create a new cache with the new capacity
+		d.blockedIPs = createCache(capacity)
 	}
 }

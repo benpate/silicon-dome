@@ -4,8 +4,11 @@ import (
 	"net"
 	"net/http"
 	"strings"
+	"time"
 
+	"github.com/benpate/derp"
 	"github.com/benpate/domain"
+	"github.com/maypok86/otter"
 )
 
 // Some notes on looking up real IP addresses:
@@ -47,6 +50,42 @@ func realIPAddress(request *http.Request) string {
 	return result
 }
 
+// createCache creates an Otter cache with the provided capacity and variable TTL.
+func createCache(capacity int) otter.CacheWithVariableTTL[string, int] {
+
+	// Don't allow negative cache sizes
+	if capacity < 0 {
+		capacity = 0
+	}
+
+	// Create a new cache with the correct capacity
+	builder, err := otter.NewBuilder[string, int](capacity)
+	derp.Report(err)
+
+	result, err := builder.WithVariableTTL().Build()
+	derp.Report(err)
+
+	return result
+}
+
+// getTTL returns a time.Duration to keep an IP address record, based
+// on the number of errors it has received
+func getTTL(count int) time.Duration {
+
+	switch {
+	// For the first five errors, wait one minute
+	case count < 5:
+		return 1 * time.Minute
+
+	case count < 60:
+		return time.Duration(2*count) * time.Minute
+
+	default:
+		return 2 * time.Hour
+	}
+}
+
+// sliceContains returns TRUE if the provided slice contains the provided value.
 func sliceContains[T comparable](slice []T, value T) bool {
 	for _, item := range slice {
 		if item == value {
