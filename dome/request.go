@@ -9,6 +9,7 @@ type Request struct {
 	IPAddress  string `bson:"ipAddress"`
 	Path       string `bson:"path"`
 	StatusCode int    `bson:"statusCode"`
+	StatusText string `bson:"statusText"`
 	journal.Journal
 }
 

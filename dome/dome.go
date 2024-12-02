@@ -17,7 +17,7 @@ type Dome struct {
 	blockedUserAgents *ahocorasick.Matcher
 	blockedPaths      *ahocorasick.Matcher
 	// blockedIPs        otter.CacheWithVariableTTL[string, int]
-	// blockOnError bool
+	// blockOnError []int
 	logDatabase data.Collection
 }
 
@@ -36,6 +36,10 @@ func New(options ...Option) Dome {
 		// blockedIPs: cache,
 	}
 
+	// Default settings...
+	result.With(BlockKnownBadBots(), BlockKnownPaths(), BlockOnError(true))
+
+	// Custom settings...
 	result.With(options...)
 	return result
 }
@@ -95,11 +99,14 @@ func (d *Dome) HandleError(request *http.Request, err error) {
 	// Try to add this error to the database log.
 	if d.logDatabase != nil {
 
+		statusCode := derp.ErrorCode(err)
+
 		record := Request{
 			UserAgent:  request.Header.Get("User-Agent"),
-			IPAddress:  request.RemoteAddr,
+			IPAddress:  realIPAddress(request),
 			Path:       request.URL.Path,
-			StatusCode: derp.ErrorCode(err),
+			StatusCode: statusCode,
+			StatusText: http.StatusText(statusCode),
 		}
 
 		if err := d.logDatabase.Save(&record, ""); err != nil {
