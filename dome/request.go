@@ -7,9 +7,11 @@ import (
 type Request struct {
 	UserAgent  string `bson:"userAgent"`
 	IPAddress  string `bson:"ipAddress"`
-	Path       string `bson:"path"`
+	URL        string `bson:"url"`
+	Method     string `bson:"method"`
 	StatusCode int    `bson:"statusCode"`
 	StatusText string `bson:"statusText"`
+	Error      error  `bson:"error"`
 	journal.Journal
 }
 

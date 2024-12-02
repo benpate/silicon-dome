@@ -104,9 +104,11 @@ func (d *Dome) HandleError(request *http.Request, err error) {
 		record := Request{
 			UserAgent:  request.Header.Get("User-Agent"),
 			IPAddress:  realIPAddress(request),
-			Path:       request.URL.Path,
+			URL:        request.URL.String(),
+			Method:     request.Method,
 			StatusCode: statusCode,
 			StatusText: http.StatusText(statusCode),
+			Error:      err,
 		}
 
 		if err := d.logDatabase.Save(&record, ""); err != nil {
