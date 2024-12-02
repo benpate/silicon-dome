@@ -20,6 +20,7 @@ var KnownAIBots []string = []string{
 	"CCBot",
 	"ChatGPT",
 	"ChatGPT-User",
+	"Claude",
 	"ClaudeBot",
 	"Claude-Web",
 	"cohere-ai",

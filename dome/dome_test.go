@@ -12,14 +12,18 @@ func TestUserAgents(t *testing.T) {
 	dome := New(BlockKnownBadBots())
 
 	verify := func(userAgent string, allowed bool) {
-		header := http.Header{
-			"User-Agent": []string{userAgent},
+		request := &http.Request{
+			Header: http.Header{
+				"User-Agent": []string{userAgent},
+			},
 		}
 
+		result := dome.VerifyRequest(request)
+
 		if allowed {
-			require.Nil(t, dome.VerifyHeader(header))
+			require.Nil(t, result)
 		} else {
-			require.NotNil(t, dome.VerifyHeader(header))
+			require.NotNil(t, result)
 		}
 	}
 

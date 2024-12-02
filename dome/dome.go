@@ -6,7 +6,6 @@ import (
 	"github.com/benpate/data"
 	"github.com/benpate/derp"
 	"github.com/cloudflare/ahocorasick"
-	"github.com/maypok86/otter"
 )
 
 // On advice from Gopher Academy, Silicon Dome uses Aho-Corasick string matching to block user agents.
@@ -17,16 +16,25 @@ import (
 type Dome struct {
 	blockedUserAgents *ahocorasick.Matcher
 	blockedPaths      *ahocorasick.Matcher
-	blockedIPs        otter.CacheWithVariableTTL[string, IPAddress]
-	logDatabase       data.Collection
-	blockNotFound     bool
+	// blockedIPs        otter.CacheWithVariableTTL[string, int]
+	// blockOnError bool
+	logDatabase data.Collection
 }
 
 // New returns a fully initialized Dome object.
 func New(options ...Option) Dome {
-	result := Dome{}
 
-	CacheCapacity(1024)(&result)
+	/*
+		cache, err := createCache(1024)
+
+		if err != nil {
+			panic(err)
+		}
+	*/
+
+	result := Dome{
+		// blockedIPs: cache,
+	}
 
 	result.With(options...)
 	return result
@@ -40,10 +48,21 @@ func (dome *Dome) With(options ...Option) {
 }
 
 // VerifyHeader verifies the returns TRUE if the provided user agent is blocked (not allowed).
-func (dome *Dome) VerifyHeader(header http.Header) error {
+func (dome *Dome) VerifyRequest(request *http.Request) error {
+
+	/*/ Check blocked IP addresses
+	spew.Dump("Blocked IP addresses::")
+	dome.blockedIPs.Range(func(key string, value int) bool {
+		spew.Dump(key, value)
+		return true
+	})
+
+	if count, _ := dome.blockedIPs.Get(request.RemoteAddr); count > 3 {
+		return derp.NewForbiddenError("dome.VerifyHeader", "Blocked due to previous scanning activity.  Try again later.", request.RemoteAddr)
+	}*/
 
 	// Check UserAgents
-	userAgent := header.Get("User-Agent")
+	userAgent := request.Header.Get("User-Agent")
 
 	if userAgent == "" {
 		return derp.NewForbiddenError("dome.VerifyHeader", "User Agent must not be empty")
@@ -57,7 +76,7 @@ func (dome *Dome) VerifyHeader(header http.Header) error {
 
 	// Check Paths
 	if dome.blockedPaths != nil {
-		path := header.Get("Path")
+		path := request.URL.Path
 		if dome.blockedPaths.Contains([]byte(path)) {
 			return derp.NewForbiddenError("dome.VerifyHeader", "Path is blocked", path)
 		}
@@ -66,6 +85,55 @@ func (dome *Dome) VerifyHeader(header http.Header) error {
 	return nil
 }
 
-func (d *Dome) Close() {
-	d.blockedIPs.Close()
+func (d *Dome) HandleError(request *http.Request, err error) {
+
+	// If no error, then no error
+	if err == nil {
+		return
+	}
+
+	// Try to add this error to the database log.
+	if d.logDatabase != nil {
+
+		record := Request{
+			UserAgent:  request.Header.Get("User-Agent"),
+			IPAddress:  request.RemoteAddr,
+			Path:       request.URL.Path,
+			StatusCode: derp.ErrorCode(err),
+		}
+
+		if err := d.logDatabase.Save(&record, ""); err != nil {
+			derp.Report(derp.Wrap(err, "dome.HandleError", "Error saving log record"))
+		}
+	}
+
+	/*/ If we're blocking certain errors, then try to check for that now
+	if d.blockOnError {
+		switch derp.ErrorCode(err) {
+		case http.StatusNotFound, http.StatusForbidden:
+			errorCount, _ := d.blockedIPs.Get(request.RemoteAddr)
+			ttl := time.Duration(2^errorCount) * time.Minute
+			d.blockedIPs.Set(request.RemoteAddr, errorCount+1, ttl)
+		}
+	}
+	*/
 }
+
+func (d *Dome) Close() {
+	// d.blockedIPs.Close()
+}
+
+/*
+func createCache(capacity int) (otter.CacheWithVariableTTL[string, int], error) {
+
+	// Don't allow negative cache sizes
+	if capacity < 0 {
+		capacity = 0
+	}
+
+	// Create a new cache with the correct capacity
+	return otter.MustBuilder[string, int](capacity).
+		WithVariableTTL().
+		Build()
+}
+*/

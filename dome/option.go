@@ -2,9 +2,7 @@ package dome
 
 import (
 	"github.com/benpate/data"
-	"github.com/benpate/derp"
 	"github.com/cloudflare/ahocorasick"
-	"github.com/maypok86/otter"
 )
 
 // Option is a functional argument that configures a Dome object.
@@ -50,10 +48,10 @@ func BlockPaths(blockedPaths ...string) Option {
  * 404/Not Found Handling
  ******************************************/
 
-// BlockNotFound configures Dome to block IP addresses that generate 404/Not Found errors
-func BlockNotFound() Option {
+// BlockOnError configures Dome to block IP addresses that generate 404/Not Found errors
+func BlockOnError() Option {
 	return func(d *Dome) {
-		d.blockNotFound = true
+		//	d.blockOnError = true
 	}
 }
 
@@ -68,24 +66,20 @@ func LogIPAddresses(collection data.Collection) Option {
 func CacheCapacity(capacity int) Option {
 	return func(d *Dome) {
 
-		// Don't allow negative cache sizes
-		if capacity < 0 {
-			capacity = 0
-		}
+		/*
+			// If the capacity has not changed, then do nothing.
+			if capacity == d.blockedIPs.Capacity() {
+				return
+			}
 
-		// If the capacity has not changed, then do nothing.
-		if capacity == d.blockedIPs.Capacity() {
-			return
-		}
+			// Close the previous cache, if it exists
+			d.blockedIPs.Close()
 
-		// Close the previous cache, if it exists
-		d.blockedIPs.Close()
-
-		// Create a new cache with the correct capacity
-		if cache, err := otter.MustBuilder[string, IPAddress](capacity).WithVariableTTL().Build(); err == nil {
-			d.blockedIPs = cache
-		} else {
-			derp.Report(err)
-		}
+			if cache, err := createCache(capacity); err == nil {
+				d.blockedIPs = cache
+			} else {
+				derp.Report(err)
+			}
+		*/
 	}
 }

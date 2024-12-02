@@ -1,2 +1,3 @@
-# silicon-dome
-Silicon Dome is a shield against AI and bot scanners
+# Silicon Dome
+
+Silicon Dome is an opinionated shield against AI and bot scanners
