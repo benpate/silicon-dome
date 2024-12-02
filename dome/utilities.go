@@ -46,3 +46,12 @@ func realIPAddress(request *http.Request) string {
 	result, _, _ := net.SplitHostPort(request.RemoteAddr)
 	return result
 }
+
+func sliceContains[T comparable](slice []T, value T) bool {
+	for _, item := range slice {
+		if item == value {
+			return true
+		}
+	}
+	return false
+}

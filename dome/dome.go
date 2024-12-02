@@ -18,7 +18,8 @@ type Dome struct {
 	blockedPaths      *ahocorasick.Matcher
 	// blockedIPs        otter.CacheWithVariableTTL[string, int]
 	// blockOnError []int
-	logDatabase data.Collection
+	logDatabase    data.Collection
+	logStatusCodes []int
 }
 
 // New returns a fully initialized Dome object.
@@ -37,7 +38,11 @@ func New(options ...Option) Dome {
 	}
 
 	// Default settings...
-	result.With(BlockKnownBadBots(), BlockKnownPaths(), BlockOnError(true))
+	result.With(
+		BlockKnownBadBots(),
+		BlockKnownPaths(),
+		LogStatusCodes(http.StatusBadRequest, http.StatusNotFound, http.StatusForbidden),
+	)
 
 	// Custom settings...
 	result.With(options...)
@@ -101,18 +106,22 @@ func (d *Dome) HandleError(request *http.Request, err error) {
 
 		statusCode := derp.ErrorCode(err)
 
-		record := Request{
-			UserAgent:  request.Header.Get("User-Agent"),
-			IPAddress:  realIPAddress(request),
-			URL:        request.URL.String(),
-			Method:     request.Method,
-			StatusCode: statusCode,
-			StatusText: http.StatusText(statusCode),
-			Error:      err,
-		}
+		// If this is a status code that we want to log, then log it.
+		if sliceContains(d.logStatusCodes, statusCode) {
 
-		if err := d.logDatabase.Save(&record, ""); err != nil {
-			derp.Report(derp.Wrap(err, "dome.HandleError", "Error saving log record"))
+			record := Request{
+				UserAgent:  request.Header.Get("User-Agent"),
+				IPAddress:  realIPAddress(request),
+				URL:        request.Host + request.URL.RequestURI(),
+				Method:     request.Method,
+				StatusCode: statusCode,
+				StatusText: http.StatusText(statusCode),
+				Error:      err,
+			}
+
+			if err := d.logDatabase.Save(&record, ""); err != nil {
+				derp.Report(derp.Wrap(err, "dome.HandleError", "Error saving log record"))
+			}
 		}
 	}
 

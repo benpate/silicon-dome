@@ -48,15 +48,15 @@ func BlockPaths(blockedPaths ...string) Option {
  * 404/Not Found Handling
  ******************************************/
 
-// BlockOnError configures Dome to block IP addresses that generate 404/Not Found errors
-func BlockOnError(value bool) Option {
+// LogStatusCodes configures Dome to log requests with specific error codes
+func LogStatusCodes(statusCodes ...int) Option {
 	return func(d *Dome) {
-		//	d.blockOnError = true
+		d.logStatusCodes = statusCodes
 	}
 }
 
-// LogIPAddresses is a dome.Option that configures the collection where failed requests will be logged
-func LogIPAddresses(collection data.Collection) Option {
+// LogDatabase is a dome.Option that configures the collection where failed requests will be logged
+func LogDatabase(collection data.Collection) Option {
 	return func(d *Dome) {
 		d.logDatabase = collection
 	}
