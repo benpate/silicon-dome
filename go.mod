@@ -1,4 +1,4 @@
-module github.com/benpate/silicon-dome
+module github.com/benpate/digital-dome
 
 go 1.23.1
 

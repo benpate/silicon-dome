@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/benpate/derp"
-	"github.com/benpate/silicon-dome/dome"
+	"github.com/benpate/digital-dome/dome"
 	"github.com/labstack/echo/v4"
 )
 
