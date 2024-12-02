@@ -51,7 +51,7 @@ func BlockPaths(blockedPaths ...string) Option {
  ******************************************/
 
 // BlockNotFound configures Dome to block IP addresses that generate 404/Not Found errors
-func BlockNotFound(capacity int) Option {
+func BlockNotFound() Option {
 	return func(d *Dome) {
 		d.blockNotFound = true
 	}
