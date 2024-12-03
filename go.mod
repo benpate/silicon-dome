@@ -9,7 +9,7 @@ require (
 	github.com/cloudflare/ahocorasick v0.0.0-20240916140611-054963ec9396
 	github.com/labstack/echo/v4 v4.12.0
 	github.com/maypok86/otter v1.2.4
-	github.com/stretchr/testify v1.9.0
+	github.com/stretchr/testify v1.10.0
 )
 
 require (
