@@ -152,6 +152,10 @@ domeConfig := dome.New(                  // Create the digital dome shield
 
 **Image Credits.  None.**  The banner image was an AI-generated using https://www.freepik.com.  AI images cannot be copyrighted or owned by anyone.  Savor the delicious irony.
 
+## No Warranty
+
+Digital Dome is a solid defense against many AI scanners and malicious bots.  But it is not a complete Web Application Firewall, and it comes with NO WARRANTIES or GUARANTEES against any particular online threats.  Be mindful.
+
 ## Pull Requests Welcome
 
-While many parts of this module have been used for years in production environments, it is still a work in progress and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making Rosetta better, send in a pull request.  We're all in this together! ✨
+The battle agains rampant AIs is ongoing, and this module will require constant upkeep to stay current. I will happily accept any and all experience reports, use cases, and contributions that will make Digital Dome better.  If you have an idea for making Digital Dome better, [file an issue](https://github.com/benpate/digital-dome/issues) or [send in a pull request](https://github.com/benpate/digital-dome/pulls).  We're all in this together! ✨
