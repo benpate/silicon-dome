@@ -1,4 +1,4 @@
-# Digital Dome
+# Digital Dome ✨
 
 <img alt="AI-generated image of flying robotic vehicles exploding in a war" src="https://github.com/benpate/digital-dome/raw/main/meta/banner.webp" style="width:100%; display:block; margin-bottom:20px;">
 
@@ -13,31 +13,71 @@
 
 Digital dome is a fast, minimal web application firewall that uses request information to protect a site against AI scanners.  It hosts several configurable rules, along with sensible (if aggressive) defaults.
 
-## Routers: Echo
+## Options
 
-Silicon Dome currently ships with adapters for [labstack echo](https://echo.labstack.com).  Other router configurations
-are easy to add
+### Block User Agents
+`BlockUserAgents(strings...)` Digital Dome can block requests based on any number of provided `User-Agent` strings.  It uses an efficient [Aho-Corasick](https://github.com/cloudflare/ahocorasick) string matching algorithm from CloudFlare to perform this operation quickly.
 
-```
+`BlockKnownBadBots()` (DEFAULT) Digital Dome maintains a [list of known bad actors](https://github.com/benpate/digital-dome/blob/main/dome/constant_userAgents.go#L11) that it can compare against each request's `User-Agent`
+
+`BlockKnownAIBots()` Digital Dome maintains a [list of known AI bots](https://github.com/benpate/digital-dome/blob/main/dome/constant_userAgents.go#L59) that it can compare against each request's `User-Agent`
+
+### Block Paths
+`BlockPaths(strings...)` Digital Dome can block requests based on any number of provided path names.  As with `User-Agent` blocking, it uses an efficient Aho-Corasick string matching algorithm from CloudFlare to perform this operation quickly.
+
+`BlockKnownPaths()` (DEFAULT) Digital Dome maintains a [list of known paths]() that are frequently scanned by scammers and are blocked by default.
+
+### Logg Errors
+`LogDatabase(data.Collection)`
+
+`LogStatusCodes(ints...)` Digital Dome
+
+### Block Malicious Requests
+`BlockStatusCodes(ints...)`
+
+`BlockCache(capacity)`
+
+## Routers
+
+Digital Dome is build to work with any Go HTTP Router library or framework.  These are very easy to make, so if your router is not listed below, please [file an issue](https://github.com/benpate/digital-dome/issues) to get one made.
+
+### Labstack Echo
+
+Digital Dome currently ships with adapters for the [labstack echo](https://echo.labstack.com) router. 
+
+```golang
 import github.com/benpate/digital-dome/dome
 import github.com/benpate/digital-dome/dome4echo
 
 // WAF Middleware
-myDome := dome4echo.New()
-e.Pre(myDome)
+
+domeConfig := dome.New()                // Additional options go here.
+middleware := dome4echo.New(domeConfig) // Populate the dome4echo middleware
+e.Pre(middleware)                       // Install the middleware
 ```
 
-## Storage MongoDB
-...
+## Storage
+
+Digital Dome uses a [storage adapter](github.com/benpate/data) to write log files to a database.  Currently, I have only written an adapter for MongoDB, but adapters can be written for any database, so please [file an issue](https://github.com/benpate/digital-dome/issues) to make one for your chosen database.
+
+To begin writing log files, simply pass a `data.Collection` into the `LogDatabase` option, and Digital Dome will use it whenever it needs to log a request.
+
+```golang
+db, err := mongodb.Connect(...)          // Connect to mongodb
+collection := mongodb.                   // Wrap mongo with a data.Collection adapter
+    NewSession(db).
+    Collection("SiliconDome_LogFiles") 
+
+domeConfig := dome.New(                  // Create the digital dome shield
+    dome.LogDatabase(collection),        // Use this database collection to log errors
+    dome.LogStatusCodes(404)             // Choose status codes to log
+)  
+```
 
 ## Image Used Without Permission
 
-**Image Credits.  None.**  The banner image is an AI-generated image that cannot be copyrighted or owned by anyone.  Savor the delicious irony.
+**Image Credits.  None.**  The banner image was an AI-generated using https://www.freepik.com.  AI images cannot be copyrighted or owned by anyone.  Savor the delicious irony.
 
 ## Pull Requests Welcome
 
-While many parts of this module have been used for years in production environments, it is still a work in progress and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making Rosetta better, send in a pull request.  We're all in this together! 🌹
-
-
-
-
+While many parts of this module have been used for years in production environments, it is still a work in progress and will benefit from your experience reports, use cases, and contributions.  If you have an idea for making Rosetta better, send in a pull request.  We're all in this together! ✨
