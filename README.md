@@ -15,33 +15,21 @@ Digital dome is a fast, minimal web application firewall that uses request infor
 
 ## Options
 
-### Block User Agents
-
 | Option | Description |
 |--------|-------------|
+| **Block User Agents** | |
 | `BlockUserAgents(strings...)` | Digital Dome can block requests based on any number of provided `User-Agent` strings.  It uses an efficient [Aho-Corasick](https://github.com/cloudflare/ahocorasick) string matching algorithm from CloudFlare to perform this operation quickly. |
 | `BlockKnownBadBots()` | (DEFAULT) Digital Dome maintains a [list of known bad actors](https://github.com/benpate/digital-dome/blob/main/dome/constant_userAgents.go#L11) that it can compare against each request's `User-Agent` |
 | `BlockKnownAIBots()` | Digital Dome maintains a [list of known AI bots](https://github.com/benpate/digital-dome/blob/main/dome/constant_userAgents.go#L59) that it can compare against each request's `User-Agent` |
-
-### Block Paths
-
-| Option | Description |
-|--------|-------------|
+| **Block Paths** | |
 | `BlockPaths(strings...)` | Digital Dome can block requests based on any number of provided path names.  As with `User-Agent` blocking, it uses an efficient Aho-Corasick string matching algorithm from CloudFlare to perform this operation quickly. |
 | `BlockKnownPaths()` | (DEFAULT) Digital Dome maintains a [list of known paths]() that are frequently scanned by scammers and are blocked by default. |
-
-### Log Errors
-
-| Option | Description |
-|--------|-------------|
+| **Log Errors** | |
 | `LogDatabase(data.Collection)` | Digital Dome can log failed requests to a database if a data.Collection is provided to this Option (see Storage below) |
 | `LogStatusCodes(ints...)` | Customize the status codes are logged using this Option.  Default values are: `StatusBadRequest`, `StatusNotFound`, and `StatusForbidden` |
-
-### Block Malicious Requests
-
-`BlockStatusCodes(ints...)`
-
-`BlockCache(capacity)`
+| **Block Malicious Requests** | |
+| `BlockStatusCodes(ints...)` | Digital Dome can track when requests trigger specific errors (for example, `StatusForbidden`) and block all requests from that IP address.  See `Blocking` below for details. |
+| `BlockCache(capacity)` | This option sets the capacity of the blocked IP address cache.  Default is 1024 IP addresses. |
 
 ## Routers
 
