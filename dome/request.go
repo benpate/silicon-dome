@@ -12,7 +12,8 @@ type Request struct {
 	StatusCode int    `bson:"statusCode"`
 	StatusText string `bson:"statusText"`
 	Error      error  `bson:"error"`
-	journal.Journal
+
+	journal.Journal `bson:",inline"`
 }
 
 func (request Request) ID() string {
