@@ -9,7 +9,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/benpate/digital-dome?style=flat-square)](https://goreportcard.com/report/github.com/benpate/digital-dome)
 [![Codecov](https://img.shields.io/codecov/c/github/benpate/digital-dome.svg?style=flat-square)](https://codecov.io/gh/benpate/digital-dome)
 
-## Opinionated protection from AIs and scanner bots.
+## Opinionated Shield from AIs and Malicious Scanners.
 
 Digital dome is a fast, minimal web application firewall that uses request information to protect a site against AI scanners.  It hosts several configurable rules, along with sensible (if aggressive) defaults.
 
