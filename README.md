@@ -28,7 +28,9 @@ e.Pre(middleware)                       // Use the middleware
 
 ## AI Scrapers
 
-I've manually collected this list of AI scrapers that Digital Dome uses to protect your website.
+I've manually collected this list of AI scrapers that Digital Dome uses to protect your website.  Any requests that contain any of the values below will be blocked before they reach your application.  
+
+In addition, since every legitimate browser includes a `User-Agent` value, requests with an empty value are also automatically blocked.
 
 ```
 Amazonbot
