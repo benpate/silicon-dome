@@ -26,6 +26,55 @@ e.Pre(middleware)                       // Use the middleware
 // easy peasy.
 ```
 
+## AI Scrapers
+
+I've manually collected this list of AI scrapers that Digital Dome uses to protect your website.
+
+```
+Amazonbot
+anthropic-ai
+AdsBot-Google
+Applebot
+Applebot-Extended
+AwarioRssBot
+AwarioSmartBot
+Bytespider
+CCBot
+ChatGPT
+ChatGPT-User
+Claude
+ClaudeBot
+Claude-Web
+cohere-ai
+DataForSeoBot
+Diffbot
+FacebookBot
+FacebookExternalHit
+FriendlyCrawler
+Google-CloudVertexBot
+Google-Extended
+GPTBot
+ImagesiftBot
+magpie-crawler
+Meta-ExternalAgent
+meta-externalagent
+NewsNow
+news-please
+OAI-SearchBot
+omgili
+omgilibot
+peer39_crawler
+PerplexityBot
+PetalBot
+Quora-Bot
+Scrapy
+TurnitinBot
+Twitterbot
+YaK
+Yandex
+YouBot
+```
+
 
 ## Options
 
@@ -33,8 +82,8 @@ e.Pre(middleware)                       // Use the middleware
 |--------|-------------|
 | **Block User Agents** | |
 | `BlockUserAgents(strings...)` | Digital Dome can block requests based on any number of provided `User-Agent` strings.  It uses an efficient [Aho-Corasick](https://github.com/cloudflare/ahocorasick) string matching algorithm from CloudFlare to perform this operation quickly. |
-| `BlockKnownBadBots()` | (DEFAULT) Digital Dome maintains a [list of known bad actors](https://github.com/benpate/digital-dome/blob/main/dome/constant_userAgents.go#L11) that it can compare against each request's `User-Agent` |
 | `BlockKnownAIBots()` | Digital Dome maintains a [list of known AI bots](https://github.com/benpate/digital-dome/blob/main/dome/constant_userAgents.go#L59) that it can compare against each request's `User-Agent` |
+| `BlockKnownBadBots()` | (DEFAULT) Digital Dome maintains a [list of known bad actors](https://github.com/benpate/digital-dome/blob/main/dome/constant_userAgents.go#L11) that it can compare against each request's `User-Agent`.  This includes all of the AI bots listed above, plus several hundred more non-search-engine user agents that are used for scraping your website. |
 | **Block Paths** | |
 | `BlockPaths(strings...)` | Digital Dome can block requests based on any number of provided path names.  As with `User-Agent` blocking, it uses an efficient Aho-Corasick string matching algorithm from CloudFlare to perform this operation quickly. |
 | `BlockKnownPaths()` | (DEFAULT) Digital Dome maintains a [list of known paths]() that are frequently scanned by scammers and are blocked by default. |
