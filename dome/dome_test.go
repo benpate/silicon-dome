@@ -2,6 +2,7 @@ package dome
 
 import (
 	"net/http"
+	"net/url"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -12,7 +13,11 @@ func TestUserAgents(t *testing.T) {
 	dome := New(BlockKnownBadBots())
 
 	verify := func(userAgent string, allowed bool) {
+
+		requestURL, _ := url.Parse("http://example.com/some-valid-path")
 		request := &http.Request{
+			Host: "example.com",
+			URL:  requestURL,
 			Header: http.Header{
 				"User-Agent": []string{userAgent},
 			},
