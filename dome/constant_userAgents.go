@@ -16,11 +16,11 @@ var KnownAIBots []string = []string{
 	"Applebot-Extended",
 	"AwarioRssBot",
 	"AwarioSmartBot",
-	"Bytespider",
+	"Bytespider", // Bytespider -> Bytedance -> TikTok
 	"CCBot",
 	"ChatGPT",
 	"ChatGPT-User",
-	"Claude",
+	"Claude", // Catch-all for Claude AI
 	"ClaudeBot",
 	"Claude-Web",
 	"cohere-ai",
@@ -685,6 +685,7 @@ var AllKnownBadBots []string = append(KnownAIBots,
 	"mediawords",
 	"muhstik-scan",
 	"netEstate NE Crawler",
+	"node", // Added 12/6/2024 due to scanning activity on Bandwagon.fm
 	"oBot",
 	"omgili",
 	"openai",
