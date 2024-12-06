@@ -73,10 +73,12 @@ func createCache(capacity int) otter.CacheWithVariableTTL[string, int] {
 func getTTL(count int) time.Duration {
 
 	switch {
-	// For the first five errors, wait one minute
-	case count < 5:
+	// For the first ten errors, wait one minute each (up to ten minutes)
+	// Requests will start being blocked after 5 errors / 5 minutes
+	case count < 10:
 		return 1 * time.Minute
 
+	// Increase linearly from 10 to 60 errors (up to two hours per request)
 	case count < 60:
 		return time.Duration(2*count) * time.Minute
 
