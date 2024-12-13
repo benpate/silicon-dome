@@ -35,7 +35,7 @@ func New(options ...Option) Dome {
 		BlockKnownBadBots(),
 		BlockKnownPaths(),
 		BlockStatusCodes(http.StatusForbidden),
-		LogStatusCodes(http.StatusBadRequest, http.StatusNotFound),
+		LogStatusCodes(http.StatusBadRequest, http.StatusNotFound, http.StatusInternalServerError),
 	)
 
 	// Custom settings...
