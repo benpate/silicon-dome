@@ -140,7 +140,7 @@ To begin writing log files, simply pass a `data.Collection` into the `LogDatabas
 db, err := mongodb.Connect(...)          // Connect to mongodb
 collection := mongodb.                   // Wrap mongo with a data.Collection adapter
     NewSession(db).
-    Collection("SiliconDome_LogFiles") 
+    Collection("DigitalDome_LogFiles") 
 
 domeConfig := dome.New(                  // Create the digital dome shield
     dome.LogDatabase(collection),        // Use this database collection to log errors
