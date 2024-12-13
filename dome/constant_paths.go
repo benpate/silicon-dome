@@ -8,10 +8,14 @@ var KnownPaths = []string{
 	"/wp-includes",             // WordPress includes directory
 	"/.cgi-bin",                // CGI directory
 	".php",                     // WordPress XML-RPC interface
-	"/.git/",                   // Git repository
 	"/phpinfo",                 // PHP
+	"/.git/",                   // Git repository
 	"/.aws/",                   // AWS directory
 	"/.aws.yml",                // AWS configuration file
 	"/.env",                    // System Environment file
+	"/.vscode/",                // Visual Studio Code directory
 	"/media/system/js/core.js", // Joomla core.js
+	"/config.json",             // JSON configuration file
+	"/application.properties",  // Java properties file
+	"/net/controller.ashx",     // .NET controller
 }
